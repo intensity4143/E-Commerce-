@@ -8,9 +8,7 @@ const BestSeller = () => {
   const [bestSeller, setBestSeller] = useState([]);
 
   useEffect(() => {
-    console.log("Products:", products);
     const bestProduct = products.filter((item) => (item.bestseller));
-    console.log("Products:", bestProduct);
     setBestSeller(bestProduct.slice(0, 5));
   }, [products]);
 
