@@ -8,13 +8,68 @@ const Collection = () => {
 
   const {products} = useContext(ShopContext);
   const [showFilter, setShowFilter] = useState(false);
-  const [filterProducts, setFilterProducts] = useState([]); 
+  const [filterProducts, setFilterProducts] = useState([]);
+  const [category, setCategory] = useState([]) ;
+  const [subCategory, setSubCategory] = useState([]);
+  const [sortType, setSortType] = useState('relevant');
+
+  // to toggle category [Men, Women, Kids]
+  const toggleCategory = (e) => {
+    if(category.includes(e.target.value)){
+      setCategory(prev => prev.filter(item => item !== e.target.value));
+    }
+    else{
+      setCategory(prev => [...prev, e.target.value]);
+    }
+  }
+
+  
+  // to toggle Type [TopWear, BottomWear, winterWear]
+  const toggleSubCategory = (e) =>{
+    if(subCategory.includes(e.target.value)){
+      setSubCategory(prev => prev.filter((item) => item !== e.target.value))
+    }
+    else{
+      setSubCategory(prev => [...prev, e.target.value]);
+    }
+  }
+  
+  // to filter and sort
+  const handleFilterAndSort = () => {
+
+    // slice() is used to create shallow copy so that any change in copy doesn't affect original array 
+    let productsCopy = products.slice();
+
+    if(category.length > 0){
+      productsCopy =  productsCopy.filter(item => category.includes(item.category))
+    }
+    
+    if(subCategory.length > 0){
+      productsCopy = productsCopy.filter(item => subCategory.includes(item.subCategory))
+    }
+
+    // sorting products based on selected preference
+    switch (sortType) {
+      case 'low-high':
+        productsCopy = productsCopy.sort((a,b) => (a.price - b.price));
+        break;
+      case 'high-low':
+        productsCopy = productsCopy.sort((a,b) => (b.price - a.price))
+        break;  
+    
+      default:
+        break;
+    }
+
+    setFilterProducts(productsCopy);
+  }
+
 
   useEffect(() => {
-    setFilterProducts(products)
-  }, [])
+    handleFilterAndSort();
+  }, [category, subCategory, sortType, products])
   
-
+  
   return (
     <div className='flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t'>
       
@@ -30,13 +85,13 @@ const Collection = () => {
           <p className='mb-3 text-sm font-medium'>CATEGROIES</p>
           <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
             <p className='flex gap-2'>
-              <input type="checkbox"  className='w-3' value={'Men'}/> Men
+              <input type="checkbox"  className='w-3' value={'Men'} onChange={toggleCategory}/> Men
             </p>
             <p className='flex gap-2'>
-              <input type="checkbox"  className='w-3' value={'Women'}/> Women
+              <input type="checkbox"  className='w-3' value={'Women'} onChange={toggleCategory}/> Women
             </p>
             <p className='flex gap-2'>
-              <input type="checkbox"  className='w-3' value={'Kids'}/> Kids
+              <input type="checkbox"  className='w-3' value={'Kids'} onChange={toggleCategory}/> Kids
             </p>
           </div>
         </div>
@@ -46,13 +101,13 @@ const Collection = () => {
           <p className='mb-3 text-sm font-medium'>TYPE</p>
           <div className='flex flex-col gap-2 text-sm font-light text-gray-700'>
             <p className='flex gap-2'>
-              <input type="checkbox"  className='w-3' value={'Topwear'}/> Topwear
+              <input type="checkbox"  className='w-3' value={'Topwear'} onChange={toggleSubCategory}/> Topwear
             </p>
             <p className='flex gap-2'>
-              <input type="checkbox"  className='w-3' value={'Bottomwear'}/> Bottomwear
+              <input type="checkbox"  className='w-3' value={'Bottomwear'} onChange={toggleSubCategory}/> Bottomwear
             </p>
             <p className='flex gap-2'>
-              <input type="checkbox"  className='w-3' value={'Winterwear'}/> Winterwear
+              <input type="checkbox"  className='w-3' value={'Winterwear'} onChange={toggleSubCategory}/> Winterwear
             </p>
           </div>
         </div>
@@ -65,7 +120,7 @@ const Collection = () => {
         <div className='flex justify-between text-base sm:text-2xl mb-4'>
           <Title text1={'ALL'} text2={'COLLECTIONS'}/>
           {/* Product Sort */}
-          <select className='border-2 border-gray-300 text-sm px-2'>
+          <select onChange={(e)=>setSortType(e.target.value)} className='border-2 border-gray-300 text-sm px-2'>
             <option value="relevant">Sort by:Relevant</option>
             <option value="low-high">Sort by: Low to High</option>
             <option value="high-low">Sort by: High to Low</option>
