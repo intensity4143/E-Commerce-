@@ -6,7 +6,7 @@ import ProductItem from '../components/ProductItem';
 
 const Collection = () => {
 
-  const {products} = useContext(ShopContext);
+  const {products, search, showSearch} = useContext(ShopContext);
   const [showFilter, setShowFilter] = useState(false);
   const [filterProducts, setFilterProducts] = useState([]);
   const [category, setCategory] = useState([]) ;
@@ -40,6 +40,11 @@ const Collection = () => {
     // slice() is used to create shallow copy so that any change in copy doesn't affect original array 
     let productsCopy = products.slice();
 
+    // if any product is searched
+    if(search){
+      productsCopy = productsCopy.filter(item => item.name.toLowerCase().includes(search.toLowerCase()))
+    }
+
     if(category.length > 0){
       productsCopy =  productsCopy.filter(item => category.includes(item.category))
     }
@@ -67,7 +72,7 @@ const Collection = () => {
 
   useEffect(() => {
     handleFilterAndSort();
-  }, [category, subCategory, sortType, products])
+  }, [category, subCategory, sortType, products, search])
   
   
   return (
