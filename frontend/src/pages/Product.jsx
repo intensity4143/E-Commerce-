@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/frontend_assets/assets";
+import RelatedProducts from "../components/RelatedProducts";
+
 
 const Product = () => {
   const { productId } = useParams();
@@ -10,15 +12,14 @@ const Product = () => {
   const [image, setImage] = useState("");
   const [size, setSize] = useState("");
 
-  const fetChProductData = () => {
-    products.map((item) => {
-      if (item._id === productId) {
-        setProductData(item);
-        setImage(item.image[0]);
-        return null;
-      }
-    });
-  };
+const fetChProductData = () => {
+  const foundProduct = products.find((item) => item._id === productId);
+  if (foundProduct) {
+    setProductData(foundProduct);
+    setImage(foundProduct.image[0]);
+  }
+};
+
 
   useEffect(() => {
     fetChProductData();
@@ -115,6 +116,8 @@ const Product = () => {
       </div>
 
       {/* -------- Display related Products ---------- */}
+
+      <RelatedProducts category = {productData.category} subCategory = {productData.subCategory}/>
 
     </div>
   ) : (
