@@ -49,9 +49,9 @@ const ShopContextProvider = (props) => {
     });
   };
 
-  useEffect(() => {
-    console.log(cartItems);
-  }, [cartItems]);
+//   useEffect(() => {
+//     console.log(cartItems);
+//   }, [cartItems]);
 
   const getCartCount = () => {
     // let toalCount = 0;
@@ -69,6 +69,29 @@ const ShopContextProvider = (props) => {
     );
   };
 
+  const updateQuantity = async (itemId, size, quantity) => {
+    setCartItems((prev)=>{
+        const updatedCart = {...prev}
+
+        if(updatedCart[itemId]){
+            updatedCart[itemId] = {...updatedCart[itemId]}
+
+            if(quantity <= 0){
+                delete updatedCart[itemId][size];
+
+                if(Object.keys(updatedCart[itemId]).length === 0){
+                    delete updatedCart[itemId];
+                }
+            }
+            else{
+                updatedCart[itemId][size] = quantity
+            }
+        }
+
+        return updatedCart;
+    })
+  }
+
   const value = {
     products,
     currency,
@@ -80,6 +103,7 @@ const ShopContextProvider = (props) => {
     cartItems,
     addToCart,
     getCartCount,
+    updateQuantity
   };
 
   return (
