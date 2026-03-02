@@ -1,62 +1,90 @@
 import { createContext, useEffect, useState } from "react";
 import { products } from "../assets/frontend_assets/assets";
-import {toast} from 'react-toastify';
+import { toast } from "react-toastify";
 
 export const ShopContext = createContext();
 
 const ShopContextProvider = (props) => {
-    const currency = '$';
-    const delivery_fee = 10;
+  const currency = "$";
+  const delivery_fee = 10;
 
-    const [search, setSearch] = useState('');
-    const [showSearch, setShowSearch] = useState(false);
-    const [cartItems, setCartItems] = useState({});
+  const [search, setSearch] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
+  const [cartItems, setCartItems] = useState({});
 
-    const addToCart = async (itemId, size) => {
-        let cardData = JSON.parse(JSON.stringify(cartItems));
+  const addToCart = async (itemId, size) => {
+    // let cardData = JSON.parse(JSON.stringify(cartItems));
 
-        if(!size){
-            toast.error("Select Product Size!")
-            return;
-        }
-
-        if(cardData[itemId]){
-            if(cardData[itemId][size]){
-                cardData[itemId][size] +=1;
-            }
-            else{
-                cardData[itemId][size] = 1;
-            }
-        }
-        else{
-            cardData[itemId] = {};
-            cardData[itemId][size] = 1;
-        }
-
-        setCartItems(cardData);
+    if (!size) {
+      toast.error("Select Product Size!");
+      return;
     }
 
-    useEffect(()=>{
-        console.log(cartItems);
-    },[cartItems])
+    // if(cardData[itemId]){
+    //     if(cardData[itemId][size]){
+    //         cardData[itemId][size] +=1;
+    //     }
+    //     else{
+    //         cardData[itemId][size] = 1;
+    //     }
+    // }
+    // else{
+    //     cardData[itemId] = {};
+    //     cardData[itemId][size] = 1;
+    // }
 
-    const value = {
-        products, 
-        currency, 
-        delivery_fee,
-        search,
-        setSearch,
-        showSearch,
-        setShowSearch,
-        cartItems,
-        addToCart
-    };
+    // setCartItems(cardData);
 
-    return (
-        <ShopContext.Provider value={value}>
-            {props.children}
-        </ShopContext.Provider>
+    setCartItems((prev) => {
+      const updatedCart = { ...prev };
+
+      if (updatedCart[itemId]) {
+        updatedCart[itemId] = { ...updatedCart[itemId] };
+        updatedCart[itemId][size] = (updatedCart[itemId][size] || 0) + 1;
+      } else {
+        updatedCart[itemId] = { [size]: 1 };
+      }
+
+      return updatedCart;
+    });
+  };
+
+  useEffect(() => {
+    console.log(cartItems);
+  }, [cartItems]);
+
+  const getCartCount = () => {
+    // let toalCount = 0;
+
+    // for(const items in cartItems){
+    //     for(const size in cartItems[items]){
+    //         toalCount += cartItems[items][size]
+    //     }
+    // }
+
+    if (!cartItems) return 0;
+    return Object.values(cartItems).reduce(
+      (total, sizes) => total + Object.values(sizes).reduce((a, b) => a + b, 0),
+      0,
     );
+  };
+
+  const value = {
+    products,
+    currency,
+    delivery_fee,
+    search,
+    setSearch,
+    showSearch,
+    setShowSearch,
+    cartItems,
+    addToCart,
+    getCartCount,
+  };
+
+  return (
+    <ShopContext.Provider value={value}>{props.children}</ShopContext.Provider>
+  );
 };
 
 export default ShopContextProvider;
