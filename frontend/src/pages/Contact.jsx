@@ -45,7 +45,7 @@ const Contact = () => {
 
           {/* Careers Section */}
           <div className='pt-4 border-t border-gray-100 w-full'>
-            <p className='font-semibold text-xl text-gray-700 tracking-wide mb-3'>Careers at ClotheSphere</p>
+            <p className='font-semibold text-xl text-gray-700 tracking-wide mb-3'>Careers at TrendCart</p>
             <p className='text-gray-500 mb-6'>Learn more about our teams and job openings.</p>
             
             <button className='group relative border border-black px-10 py-4 text-sm transition-all duration-500 overflow-hidden'>
