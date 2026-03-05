@@ -3,6 +3,7 @@ const cors = require('cors');
 const userRouter = require('./routes/userRoutes')
 const dbConnect = require('./config/database');
 const cloudinaryConnect = require('./config/cloudinary');
+const producteRouter = require('./routes/productRoute');
 require('dotenv').config();
 
 // App config
@@ -17,6 +18,7 @@ app.use(cors());
 
 // route mounting
 app.use('/api/user', userRouter)
+app.use('/api/product', producteRouter)
 
 
 // default route

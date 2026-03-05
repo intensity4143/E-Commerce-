@@ -10,16 +10,52 @@ const createToken = (id)=>{
     })
 }
 
+
+// login controller
 const loginUser = async(req, res) =>{
     try {
-        return res.json({
-            msg:"user login api working"
-        })
-    } catch (error) {
         
+        const {email, password} = req.body
+        const user = await User.findOne({email})
+
+        // checking if user exists
+        if(!user){
+            return res.status(400).json({
+                success:false,
+                message:"User does not exist"
+            })
+        }             
+        
+        // comparing password
+        const isMatch = await bcrypt.compare(password, user.password)
+
+        // if password does not match
+        if(!isMatch){
+            return res.status(400).json({
+                success:false,
+                message:"Invalid Credentials"
+            })
+        }   
+
+        // creating token
+        const token = createToken(user._id)
+        
+        return res.status(200).json({
+            success: true,
+            token
+        })
+
+    } 
+    catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            status: false,
+            message: "Internal Server Error!"
+        })
     }
 }
 
+// register controller
 const registerUser = async(req, res) =>{
     try {
         
