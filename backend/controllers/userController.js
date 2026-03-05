@@ -12,6 +12,19 @@ const createToken = (id)=>{
 }
 
 
+// function to create Admin token
+const createAdminToken = (email, password)=>{
+    return jwt.sign(
+        { 
+            admin: email + password,
+            isAdmin: true 
+        }, 
+        process.env.JWT_SECRET, 
+        { expiresIn: '1d' }
+    )
+}
+
+
 // login controller
 const loginUser = async(req, res) =>{
     try {
@@ -118,7 +131,7 @@ const adminLogin = async(req, res) =>{
 
         if(email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD){
 
-            const token = createToken(email+password)
+            const token = createAdminToken(email,password)
             return res.status(200).json({
                 success:true,
                 token

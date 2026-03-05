@@ -9,10 +9,12 @@ const {
 } = require('../controllers/productController');
 
 const upload = require('../middleware/multer');
+const adminAuth = require('../middleware/adminAuth');
 
 // add product
 productRouter.post(
   '/add',
+  adminAuth,
   upload.fields([
     { name: 'image1', maxCount: 1 },
     { name: 'image2', maxCount: 1 },
@@ -29,6 +31,6 @@ productRouter.get('/list', listProducts);
 productRouter.get('/single/:id', singleProduct);
 
 // delete product
-productRouter.delete('/remove/:id', removeProduct);
+productRouter.delete('/remove/:id', adminAuth, removeProduct);
 
 module.exports = productRouter;
