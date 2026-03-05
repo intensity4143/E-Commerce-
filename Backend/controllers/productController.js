@@ -1,5 +1,6 @@
 const Product = require("../models/ProductModel");
 const cloudinary = require("cloudinary").v2;
+const fs = require("fs");
 
 // controller for adding product
 const addProduct = async (req, res) => {
@@ -30,6 +31,9 @@ const addProduct = async (req, res) => {
           resource_type: "image",
           folder: "TrendCart",
         });
+
+        // remove local file after upload
+        fs.unlinkSync(item.path);
 
         return result.secure_url;
       }),
