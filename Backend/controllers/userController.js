@@ -1,7 +1,8 @@
 const User = require('../models/UserModel');
 const validator = require('validator')
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const { create } = require('../models/ProductModel');
 
 // function to create token
 const createToken = (id)=>{
@@ -109,11 +110,32 @@ const registerUser = async(req, res) =>{
     }
 }
 
+// admin login function
 const adminLogin = async(req, res) =>{
     try {
-        return res("admin api working")
-    } catch (error) {
         
+        const {email, password} = req.body
+
+        if(email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD){
+
+            const token = createToken(email+password)
+            return res.status(200).json({
+                success:true,
+                token
+            })
+        }
+
+        return res.status(400).json({
+            success:false,
+            message:"Invalid Credentials!"
+        })
+    } 
+    catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            status: false,
+            message: "Internal Server Error!"
+        })
     }
 
 }
