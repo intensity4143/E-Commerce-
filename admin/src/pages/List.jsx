@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { backendUrl, currency } from "../App";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Trash2 } from "lucide-react";
 
 const List = ({ token }) => {
   const [list, setList] = useState([]);
@@ -73,12 +74,13 @@ const List = ({ token }) => {
               {currency}
               {item.price}
             </p>
-            <p
-              onClick={() => removeProduct(item._id)}
-              className="text-right md:text-center cursor-pointer text-lg"
-            >
-              X
-            </p>
+            <div className="justify-self-center">
+              <Trash2
+                onClick={() => removeProduct(item._id)}
+                className="hover:text-red-700 cursor-pointer"
+                size={18}
+              />
+            </div>
           </div>
         ))}
       </div>
