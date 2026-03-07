@@ -1,7 +1,10 @@
 import React, { useState } from 'react'
 import { assets } from '../assets/assets'
+import { backendUrl } from '../App'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 
-const Add = () => {
+const Add = ({token}) => {
   const [image1, setImage1] = useState(false)
   const [image2, setImage2] = useState(false)
   const [image3, setImage3] = useState(false)
@@ -15,8 +18,54 @@ const Add = () => {
   const [bestseller, setBestseller] = useState(false);
   const [sizes, setSizes] = useState([]);
 
+  const onSubmitHandler = async(e)=>{
+    try {
+        e.preventDefault();
+
+        const formData = new FormData()
+
+        formData.append("name", name)
+        formData.append("description", description)
+        formData.append("price", price)
+        formData.append("category", category)
+        formData.append("subCategory", subCategory)
+        formData.append("bestseller", bestseller)
+        formData.append("sizes", JSON.stringify(sizes))
+
+        image1 && formData.append("image1", image1)
+        image2 && formData.append("image2", image2)
+        image3 && formData.append("image3", image3)
+        image4 && formData.append("image4", image4)
+
+        const response = await axios.post(`${backendUrl}/api/product/add`, 
+          formData
+          ,{ headers: { Authorization: `Bearer ${token}` } }
+        )
+
+        if(response.data.success){
+          toast.success(response.data.message)
+          setName('')
+          setDescription('')
+          setImage1(false)
+          setImage2(false)
+          setImage3(false)
+          setImage4(false)
+          setPrice('')
+        }
+        else{
+          toast.error(response.data.message)
+        }
+    } 
+    catch (error) {
+        toast.error(error.response.data.message)
+    }
+
+  }
+
   return (
-    <form className='flex flex-col w-full items-start gap-3'>
+    <form onSubmit={onSubmitHandler} 
+      className='flex flex-col w-full items-start gap-3'>
+
         <div>
             <p className='mb-2'>Upload Image</p>
 
@@ -122,6 +171,8 @@ const Add = () => {
           <div>
             <p className='mb-2'>Product Price</p>
             <input 
+              value={price}
+              onChange={(e)=>setPrice(e.target.value)}
               className='w-full px-3 py-2 sm:w-[120px]' 
               type="Number" placeholder='25' />
           </div>
@@ -133,30 +184,33 @@ const Add = () => {
           <div className='flex gap-3'>
 
             <div onClick={()=>setSizes(prev => prev.includes("S")? prev.filter(item => item !== 'S') : [...prev, "S"])}>
-              <p className='bg-slate-200 px-3 py-1 cursor-pointer'>S</p>
+              <p className={`${sizes.includes("S")? "bg-blue-600 text-white" : "bg-slate-200"} px-3 py-1 cursor-pointer`}>S</p>
             </div>
             
             <div onClick={()=>setSizes(prev => prev.includes("M")? prev.filter(item => item !== 'M') : [...prev, "M"])}>
-              <p className='bg-slate-200 px-3 py-1 cursor-pointer'>M</p>
+              <p className={`${sizes.includes("M")? "bg-blue-600 text-white" : "bg-slate-200"} px-3 py-1 cursor-pointer`}>M</p>
             </div>
 
             <div onClick={()=>setSizes(prev => prev.includes("L")? prev.filter(item => item !== 'L') : [...prev, "L"])}>
-              <p className='bg-slate-200 px-3 py-1 cursor-pointer'>L</p>
+              <p className={`${sizes.includes("L")? "bg-blue-600 text-white" : "bg-slate-200"} px-3 py-1 cursor-pointer`}>L</p>
             </div>
 
             <div onClick={()=>setSizes(prev => prev.includes("XL")? prev.filter(item => item !== 'XL') : [...prev, "XL"])}>
-              <p className='bg-slate-200 px-3 py-1 cursor-pointer'>XL</p>
+              <p className={`${sizes.includes("XL")? "bg-blue-600 text-white" : "bg-slate-200"} px-3 py-1 cursor-pointer`}>XL</p>
             </div>
 
             <div onClick={()=>setSizes(prev => prev.includes("XXL")? prev.filter(item => item !== 'XXL') : [...prev, "XXL"])}>
-              <p className='bg-slate-200 px-3 py-1 cursor-pointer'>XXL</p>
+              <p className={`${sizes.includes("XXL")? "bg-blue-600 text-white" : "bg-slate-200"} px-3 py-1 cursor-pointer`}>XXL</p>
             </div>
 
           </div>
         </div>
 
         <div className='flex gap-2 mt-2'>
-          <input type="checkbox" id='bestseller' />
+          <input
+            checked = {bestseller} 
+            onChange={()=> setBestseller(prev => !prev)} 
+            type="checkbox" id='bestseller' />
           <label
             className='cursor-pointer' 
             htmlFor="bestseller">Add to Bestseller</label>

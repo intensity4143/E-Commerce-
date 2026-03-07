@@ -8,7 +8,7 @@ const adminAuth = async(req, res, next)=>{
 
         // if token not found
         if(!token){
-            return res.status(404).json({
+            return res.status(401).json({
                 success:false,
                 message: "Not Authorized, Login Again!"
             })
