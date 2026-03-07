@@ -18,9 +18,12 @@ const Add = ({token}) => {
   const [bestseller, setBestseller] = useState(false);
   const [sizes, setSizes] = useState([]);
 
+  const [loading, setLoading] = useState(false);
+
   const onSubmitHandler = async(e)=>{
     try {
         e.preventDefault();
+        setLoading(true)
 
         const formData = new FormData()
 
@@ -58,6 +61,9 @@ const Add = ({token}) => {
     } 
     catch (error) {
         toast.error(error.response.data.message)
+    }
+    finally{
+      setLoading(false)
     }
 
   }
@@ -174,7 +180,7 @@ const Add = ({token}) => {
               value={price}
               onChange={(e)=>setPrice(e.target.value)}
               className='w-full px-3 py-2 sm:w-[120px]' 
-              type="Number" placeholder='25' />
+              type="Number" placeholder='25' required />
           </div>
         </div>
 
@@ -217,8 +223,9 @@ const Add = ({token}) => {
         </div>
 
         <button
+          disabled = {loading}
           className='w-28 py-3 mt-4 bg-black text-white' 
-          type='submit '>ADD</button>
+          type='submit '>{loading? "ADDING..":"ADD"}</button>
     </form>
   )
 }
