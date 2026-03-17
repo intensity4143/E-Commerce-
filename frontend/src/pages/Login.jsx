@@ -1,18 +1,69 @@
-import React, { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
+import { ShopContext } from '../context/ShopContext';
+import axios from 'axios';
 
 const Login = () => {
+
   const [currentState, setCurrentState] = useState('Sign Up');
+  const {token, setToken, navigate, backendUrl} = useContext(ShopContext)
+
+  const [name, setName] = useState('')
+  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('')
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     try {
-      // Manual Email/Password Logic
+      // for Sign Up
+      if(currentState === 'Sign Up'){
+        const resp = await axios.post(`${backendUrl}/api/user/register`, {
+          name, email, password  
+        })
+
+        if(resp.data.success){
+          setToken(resp.data.token)
+          localStorage.setItem("token", resp.data.token)
+          setEmail('');
+          setPassword('');
+          setName('');
+          navigate('/')
+        }
+        else{
+          toast.error(resp.data.message || "Something went wrong");
+        }
+      }
+
+      // login
+      else{
+        const resp = await axios.post(`${backendUrl}/api/user/login`, {
+          email, password  
+        })
+
+        if(resp.data.success){
+          setToken(resp.data.token)
+          localStorage.setItem("token", resp.data.token)
+          setEmail('');
+          setPassword('');
+          setName('');
+          navigate('/')
+        }
+        else{
+          toast.error(resp.data.message || "Something went wrong");
+        }
+      }
       console.log("Form Submitted", currentState);
-    } catch (error) {
-      console.error(error);
+    } 
+    catch (error) {
+      toast.error(error.response?.data?.message || "something went wrong");
     }
   };
+
+useEffect(() => {
+  if (token) {
+    navigate('/');
+  }
+}, [token]);
 
   const handleGoogleAuth = () => {
     // Google Auth Logic will go here later
@@ -36,6 +87,8 @@ const Login = () => {
       <div className='w-full flex flex-col gap-4'>
         {currentState === 'Sign Up' && (
           <input 
+            onChange={(e)=>{setName(e.target.value)}}
+            value={name}
             type="text" 
             className='w-full px-4 py-2 border border-gray-400 focus:border-gray-800 outline-none transition-all placeholder:text-gray-400' 
             placeholder='Name' 
@@ -43,12 +96,16 @@ const Login = () => {
           />
         )}
         <input 
+          onChange={(e)=>{setEmail(e.target.value)}}
+          value={email}
           type="email" 
           className='w-full px-4 py-2 border border-gray-400 focus:border-gray-800 outline-none transition-all placeholder:text-gray-400' 
           placeholder='Email' 
           required 
         />
         <input 
+          onChange={(e)=>{setPassword(e.target.value)}}
+          value={password}
           type="password" 
           className='w-full px-4 py-2 border border-gray-400 focus:border-gray-800 outline-none transition-all placeholder:text-gray-400' 
           placeholder='Password' 

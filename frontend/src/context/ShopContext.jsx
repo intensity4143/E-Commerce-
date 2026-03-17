@@ -1,17 +1,20 @@
-import { createContext, useEffect, useState } from "react";
-import { products } from "../assets/frontend_assets/assets";
+import { createContext, use, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {useNavigate} from 'react-router-dom'
+import axios from 'axios'
 
 export const ShopContext = createContext();
 
 const ShopContextProvider = (props) => {
   const currency = "$";
   const delivery_fee = 10;
-
+  const backendUrl = import.meta.env.VITE_BACKEND_URL
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [cartItems, setCartItems] = useState({});
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState('')
   const navigate = useNavigate();
 
   const addToCart = async (itemId, size) => {
@@ -111,6 +114,38 @@ const ShopContextProvider = (props) => {
     return totalAmount;
   }
 
+  // fetching productss
+  const getProductsData = async () => {
+    try {
+      const resp = await axios.get(`${backendUrl}/api/product/list`);
+      if(resp.data.success){
+        setProducts(resp.data.products);
+      }
+      else{
+        toast.error(resp.data.message)
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      toast.error(error.message)
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  // fetch token if present in local storage
+  useEffect(() => {
+  const storedToken = localStorage.getItem("token");
+
+  if (storedToken) {
+    setToken(storedToken);
+  }
+}, []);
+
+useEffect(() => {
+  getProductsData();
+}, []);
+
   const value = {
     products,
     currency,
@@ -124,7 +159,10 @@ const ShopContextProvider = (props) => {
     getCartCount,
     updateQuantity, 
     getCartAmount,
-    navigate
+    navigate,
+    backendUrl,
+    token,
+    setToken
   };
 
   return (

@@ -29,8 +29,9 @@ const productSchema = new mongoose.Schema({
         type: Array,
         required: true,
     },
-    betseller: {
+    bestseller: {
         type: Boolean,
+        default: false
         // required: true,
     },
     date: {

@@ -2,7 +2,6 @@ const User = require('../models/UserModel');
 const validator = require('validator')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
-const { create } = require('../models/ProductModel');
 
 // function to create token
 const createToken = (id)=>{
@@ -63,7 +62,7 @@ const loginUser = async(req, res) =>{
     catch (error) {
         console.log(error)
         return res.status(500).json({
-            status: false,
+            success: false,
             message: "Internal Server Error!"
         })
     }

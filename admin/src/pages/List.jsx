@@ -33,7 +33,7 @@ const List = ({ token }) => {
 
       if (response.data.success) {
         toast.success(response.data.message);
-        fetchList();
+        setList((prev) => prev.filter((item) => item._id !== id));
       } else {
         toast.error(response.data.message);
       }
