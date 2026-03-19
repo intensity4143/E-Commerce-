@@ -1,4 +1,4 @@
-import { createContext, use, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {useNavigate} from 'react-router-dom'
 import axios from 'axios'
@@ -17,42 +17,43 @@ const ShopContextProvider = (props) => {
   const [token, setToken] = useState('')
   const navigate = useNavigate();
 
-  const addToCart = async (itemId, size) => {
-    // let cardData = JSON.parse(JSON.stringify(cartItems));
+const addToCart = async (itemId, size) => {
 
-    if (!size) {
-      toast.error("Select Product Size!");
-      return;
+  if (!size) {
+    toast.error("Select Product Size!");
+    return;
+  }
+
+  setCartItems((prev) => {
+    const updatedCart = { ...prev };
+
+    if (updatedCart[itemId]) {
+      updatedCart[itemId] = { ...updatedCart[itemId] };
+      updatedCart[itemId][size] = (updatedCart[itemId][size] || 0) + 1;
+    } else {
+      updatedCart[itemId] = { [size]: 1 };
     }
 
-    // if(cardData[itemId]){
-    //     if(cardData[itemId][size]){
-    //         cardData[itemId][size] +=1;
-    //     }
-    //     else{
-    //         cardData[itemId][size] = 1;
-    //     }
-    // }
-    // else{
-    //     cardData[itemId] = {};
-    //     cardData[itemId][size] = 1;
-    // }
+    return updatedCart;
+  });
 
-    // setCartItems(cardData);
-
-    setCartItems((prev) => {
-      const updatedCart = { ...prev };
-
-      if (updatedCart[itemId]) {
-        updatedCart[itemId] = { ...updatedCart[itemId] };
-        updatedCart[itemId][size] = (updatedCart[itemId][size] || 0) + 1;
-      } else {
-        updatedCart[itemId] = { [size]: 1 };
-      }
-
-      return updatedCart;
-    });
-  };
+  if (token) {
+    try {
+      await axios.post(
+        `${backendUrl}/api/cart/add`,
+        { itemId, size },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  }
+};
 
 //   useEffect(() => {
 //     console.log(cartItems);
@@ -95,8 +96,22 @@ const ShopContextProvider = (props) => {
 
         return updatedCart;
     })
+
+    // call api to update cart
+    if(token){
+      try {
+          await axios.post(`${backendUrl}/api/cart/update`,
+          {itemId, size, quantity},
+          {headers:{Authorization :`Bearer ${token}`}}
+        )
+      } catch (error) {
+        console.log(error)
+        toast.error(error.message)
+      }
+    }
   }
 
+  // function to get cart amount
   const getCartAmount = () => {
     let totalAmount = 0;
 
@@ -132,15 +147,35 @@ const ShopContextProvider = (props) => {
     }
   };
 
+  // get user cart data
+  const getUserCart = async (token) => {
+      try {
+        
+        const response = await axios.post(`${backendUrl}/api/cart/get`, 
+          {},
+          {headers: {
+            Authorization:`Bearer ${token}`
+          }}
+        )
+
+        if(response.data.success){
+          setCartItems(response.data.cartData)
+        }
+
+      } catch (error) {
+        console.log(error)
+        toast.error(error.message)
+      }
+  }
 
   // fetch token if present in local storage
   useEffect(() => {
-  const storedToken = localStorage.getItem("token");
-
-  if (storedToken) {
-    setToken(storedToken);
-  }
-}, []);
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+      getUserCart(storedToken)
+    }
+  }, []);
 
 useEffect(() => {
   getProductsData();

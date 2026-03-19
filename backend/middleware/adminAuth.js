@@ -15,7 +15,6 @@ const adminAuth = async(req, res, next)=>{
         }
 
         const decode_token = jwt.verify(token, process.env.JWT_SECRET)
-        console.log(decode_token)
 
         // Compare the decoded token with admin email+password combination
         if(!decode_token.isAdmin || decode_token.admin !== process.env.ADMIN_EMAIL + process.env.ADMIN_PASSWORD){

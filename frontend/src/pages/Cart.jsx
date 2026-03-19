@@ -14,20 +14,22 @@ const Cart = () => {
   useEffect(() => {
     const tempData = [];
 
-    for (const item in cartItems) {
-      for (const s in cartItems[item]) {
-        if (cartItems[item][s] > 0) {
-          tempData.push({
-            _id: item,
-            size: s,
-            quantity: cartItems[item][s],
-          });
+    if(products.length > 0){
+      for (const item in cartItems) {
+        for (const s in cartItems[item]) {
+          if (cartItems[item][s] > 0) {
+            tempData.push({
+              _id: item,
+              size: s,
+              quantity: cartItems[item][s],
+            });
+          }
         }
-      }
+      } 
     }
 
     setCartData(tempData);
-  }, [cartItems]);
+  }, [cartItems, products]);
 
   function handleCheckout(){
 
