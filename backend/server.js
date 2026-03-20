@@ -4,7 +4,8 @@ const userRouter = require('./routes/userRoutes')
 const dbConnect = require('./config/database');
 const cloudinaryConnect = require('./config/cloudinary');
 const producteRouter = require('./routes/productRoute');
-const cartRouter = require('./routes/cartRoute')
+const cartRouter = require('./routes/cartRoute');
+const orderRouter = require('./routes/orderRoute');
 require('dotenv').config();
 
 // App config
@@ -21,6 +22,7 @@ app.use(cors());
 app.use('/api/user', userRouter)
 app.use('/api/product', producteRouter)
 app.use('/api/cart', cartRouter)
+app.use('/api/order', orderRouter)
 
 
 // default route
