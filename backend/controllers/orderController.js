@@ -52,21 +52,31 @@ const placeOrderStripe = async (req, res) => {};
 const placeOrderRazorpay = async (req, res) => {};
 
 // All Orders data for Admin Panel
-const allOrders = async (req, res) => {};
+const allOrders = async (req, res) => {
+  try {
+    const orders = await orderModel.find({})
+    res.json({
+      success:true,
+      orders
+    })
+
+  } catch (error) {
+    console.log(error)
+    return res.json({
+      success: false,
+      message: "Internal Server error!"
+    })
+  }
+};
 
 // All Orders data for For Frontend
 const userOrders = async (req, res) => {
   try {
     const userId = req.userId;
 
-    if(!user){
-      return res.json({
-        success:false,
-        message:"user not found!"
-      })
-    }
     const orders = await orderModel.find({userId}) 
-    res.json({
+
+    return res.json({
       success:true,
       orders
     })

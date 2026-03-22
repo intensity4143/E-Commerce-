@@ -13,9 +13,9 @@ orderRouter.post('/status', adminAuth, updateStatus)
 // Payment Features routes
 orderRouter.post('/place', authUser, placeOrder)
 orderRouter.post('/stripe', authUser, placeOrderStripe)
-orderRouter.post('razor', authUser, placeOrderRazorpay)
+orderRouter.post('/razor', authUser, placeOrderRazorpay)
 
 // User Feature
-orderRouter.post('userOrders', authUser, userOrders)
+orderRouter.post('/userOrders', authUser, userOrders)
 
 module.exports = orderRouter;
