@@ -190,6 +190,7 @@ useEffect(() => {
     showSearch,
     setShowSearch,
     cartItems,
+    setCartItems,
     addToCart,
     getCartCount,
     updateQuantity, 

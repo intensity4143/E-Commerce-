@@ -3,13 +3,24 @@ import Title from "../components/Title";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import CartTotal from "../components/CartTotal";
-import { assets } from "../assets/frontend_assets/assets";
+import { assets} from "../assets/frontend_assets/assets";
 import { ShopContext } from "../context/ShopContext";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const PlaceOrder = () => {
   const [phone, setPhone] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cod");
-  const { navigate } = useContext(ShopContext);
+  const {
+    navigate,
+    backendUrl,
+    token,
+    products,
+    cartItems,
+    setCartItems,
+    getCartAmount,
+    delivery_fee,
+  } = useContext(ShopContext);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -31,8 +42,70 @@ const PlaceOrder = () => {
     setFormData((data) => ({ ...data, [name]: value }));
   };
 
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
+
+    try {
+      let orderItems = [];
+      
+      for (const item in cartItems) {
+        for (const size in cartItems[item]) {
+          const prodctInfo = structuredClone( products.find((product) => product._id === item));
+          
+          if (prodctInfo) {
+            prodctInfo.size = size
+            prodctInfo.quantity = cartItems[item][size]
+            orderItems.push(prodctInfo)
+          }
+        }
+      }
+      
+      let orderData = {
+        address: formData,
+        items: orderItems,
+        amount: getCartAmount() + delivery_fee
+      }
+      
+      // switch case to call for different order api based on payment method
+      switch(paymentMethod){
+
+        // API call for COD
+        case 'cod':
+            const response = await axios.post(`${backendUrl}/api/order/place`, 
+              orderData,
+              {
+                headers: {
+                  Authorization :`Bearer ${token}`
+                }
+              }
+            )
+
+            // if order placed successfully then -> empty carts and navigate to orders page
+            if(response.data.success){
+              console.log(response.data)
+              setCartItems({})
+              navigate('/orders')
+            }
+            else{
+              toast.error(response.data.message)
+            }
+            break;
+
+        default:
+          break;
+      }
+
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message)
+    }
+  };
+
   return (
-    <form className="flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] border-t">
+    <form
+      onSubmit={onSubmitHandler}
+      className="flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] border-t"
+    >
       {/* left side */}
       <div className="flex flex-col gap-4 w-full sm:max-w-[480px]">
         <div className="text-xl sm:text-2xl my-3">
@@ -131,7 +204,6 @@ const PlaceOrder = () => {
           onChange={(phone) => setFormData((prev) => ({ ...prev, phone }))}
         />
       </div>
-
       {/* Right side */}
       required
       <div className="mt-8">
