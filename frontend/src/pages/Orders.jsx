@@ -7,6 +7,7 @@ const Orders = () => {
   const [orderData, setOrderData] = useState([]);
   const { backendUrl, token, currency } = useContext(ShopContext);
 
+  // to fetch all orders of users
   const allOrderData = async () => {
     try {
       if (!token) {
@@ -41,7 +42,6 @@ const Orders = () => {
         setOrderData(allOrderItems.reverse());
       }
 
-      console.log(response.data);
     } catch (error) {}
   };
 
@@ -58,7 +58,7 @@ const Orders = () => {
       </div>
 
       <div>
-        {orderData.slice(1, 4).map((item, index) => (
+        {orderData.map((item, index) => (
           <div
             key={index}
             className="py-4 border-t border-b border-gray-300 text-gray-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4 "

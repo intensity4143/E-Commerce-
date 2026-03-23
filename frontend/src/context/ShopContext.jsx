@@ -1,63 +1,62 @@
 import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import {useNavigate} from 'react-router-dom'
-import axios from 'axios'
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export const ShopContext = createContext();
 
 const ShopContextProvider = (props) => {
   const currency = "$";
   const delivery_fee = 10;
-  const backendUrl = import.meta.env.VITE_BACKEND_URL
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [cartItems, setCartItems] = useState({});
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState('')
+  const [token, setToken] = useState("");
   const navigate = useNavigate();
 
-const addToCart = async (itemId, size) => {
-
-  if (!size) {
-    toast.error("Select Product Size!");
-    return;
-  }
-
-  setCartItems((prev) => {
-    const updatedCart = { ...prev };
-
-    if (updatedCart[itemId]) {
-      updatedCart[itemId] = { ...updatedCart[itemId] };
-      updatedCart[itemId][size] = (updatedCart[itemId][size] || 0) + 1;
-    } else {
-      updatedCart[itemId] = { [size]: 1 };
+  const addToCart = async (itemId, size) => {
+    if (!size) {
+      toast.error("Select Product Size!");
+      return;
     }
 
-    return updatedCart;
-  });
+    setCartItems((prev) => {
+      const updatedCart = { ...prev };
 
-  if (token) {
-    try {
-      await axios.post(
-        `${backendUrl}/api/cart/add`,
-        { itemId, size },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+      if (updatedCart[itemId]) {
+        updatedCart[itemId] = { ...updatedCart[itemId] };
+        updatedCart[itemId][size] = (updatedCart[itemId][size] || 0) + 1;
+      } else {
+        updatedCart[itemId] = { [size]: 1 };
+      }
+
+      return updatedCart;
+    });
+
+    if (token) {
+      try {
+        await axios.post(
+          `${backendUrl}/api/cart/add`,
+          { itemId, size },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        }
-      );
-    } catch (error) {
-      console.log(error);
-      toast.error(error.message);
+        );
+      } catch (error) {
+        console.log(error);
+        toast.error(error.message);
+      }
     }
-  }
-};
+  };
 
-//   useEffect(() => {
-//     console.log(cartItems);
-//   }, [cartItems]);
+  //   useEffect(() => {
+  //     console.log(cartItems);
+  //   }, [cartItems]);
 
   const getCartCount = () => {
     // let toalCount = 0;
@@ -76,72 +75,70 @@ const addToCart = async (itemId, size) => {
   };
 
   const updateQuantity = async (itemId, size, quantity) => {
-    setCartItems((prev)=>{
-        const updatedCart = {...prev}
+    setCartItems((prev) => {
+      const updatedCart = { ...prev };
 
-        if(updatedCart[itemId]){
-            updatedCart[itemId] = {...updatedCart[itemId]}
+      if (updatedCart[itemId]) {
+        updatedCart[itemId] = { ...updatedCart[itemId] };
 
-            if(quantity <= 0){
-                delete updatedCart[itemId][size];
+        if (quantity <= 0) {
+          delete updatedCart[itemId][size];
 
-                if(Object.keys(updatedCart[itemId]).length === 0){
-                    delete updatedCart[itemId];
-                }
-            }
-            else{
-                updatedCart[itemId][size] = quantity
-            }
+          if (Object.keys(updatedCart[itemId]).length === 0) {
+            delete updatedCart[itemId];
+          }
+        } else {
+          updatedCart[itemId][size] = quantity;
         }
+      }
 
-        return updatedCart;
-    })
+      return updatedCart;
+    });
 
     // call api to update cart
-    if(token){
+    if (token) {
       try {
-          await axios.post(`${backendUrl}/api/cart/update`,
-          {itemId, size, quantity},
-          {headers:{Authorization :`Bearer ${token}`}}
-        )
+        await axios.post(
+          `${backendUrl}/api/cart/update`,
+          { itemId, size, quantity },
+          { headers: { Authorization: `Bearer ${token}` } },
+        );
       } catch (error) {
-        console.log(error)
-        toast.error(error.message)
+        console.log(error);
+        toast.error(error.message);
       }
     }
-  }
+  };
 
   // function to get cart amount
   const getCartAmount = () => {
     let totalAmount = 0;
 
     for (const itemId in cartItems) {
-
       const itemInfo = products.find((product) => product._id === itemId);
 
-        if (!itemInfo) continue;
+      if (!itemInfo) continue;
 
-        for (const size in cartItems[itemId]) {
-          totalAmount += itemInfo.price * cartItems[itemId][size];
+      for (const size in cartItems[itemId]) {
+        totalAmount += itemInfo.price * cartItems[itemId][size];
       }
     }
 
     return totalAmount;
-  }
+  };
 
   // fetching productss
   const getProductsData = async () => {
     try {
       const resp = await axios.get(`${backendUrl}/api/product/list`);
-      if(resp.data.success){
+      if (resp.data.success) {
         setProducts(resp.data.products);
-      }
-      else{
-        toast.error(resp.data.message)
+      } else {
+        toast.error(resp.data.message);
       }
     } catch (error) {
       console.error("Error fetching products:", error);
-      toast.error(error.message)
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
@@ -149,37 +146,43 @@ const addToCart = async (itemId, size) => {
 
   // get user cart data
   const getUserCart = async (token) => {
-      try {
-        
-        const response = await axios.post(`${backendUrl}/api/cart/get`, 
-          {},
-          {headers: {
-            Authorization:`Bearer ${token}`
-          }}
-        )
+    try {
+      const response = await axios.post(
+        `${backendUrl}/api/cart/get`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
-        if(response.data.success){
-          setCartItems(response.data.cartData)
-        }
-
-      } catch (error) {
-        console.log(error)
-        toast.error(error.message)
+      if (response.data.success) {
+        setCartItems(response.data.cartData);
       }
-  }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
 
   // fetch token if present in local storage
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
       setToken(storedToken);
-      getUserCart(storedToken)
     }
   }, []);
 
-useEffect(() => {
-  getProductsData();
-}, []);
+  useEffect(() => {
+    if (token) {
+      getUserCart(token);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    getProductsData();
+  }, []);
 
   const value = {
     products,
@@ -193,12 +196,12 @@ useEffect(() => {
     setCartItems,
     addToCart,
     getCartCount,
-    updateQuantity, 
+    updateQuantity,
     getCartAmount,
     navigate,
     backendUrl,
     token,
-    setToken
+    setToken,
   };
 
   return (

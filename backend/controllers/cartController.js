@@ -3,7 +3,8 @@ const UserModel = require('../models/UserModel')
 // add products to cart
 const addToCart = async (req, res) => {
   try {
-    const { userId, itemId, size } = req.body;
+    const userId = req.userId;
+    const {itemId, size } = req.body;
 
     const user = await UserModel.findById(userId);
 
@@ -43,7 +44,8 @@ const addToCart = async (req, res) => {
 // update user cart
 const updateCart = async (req, res) => {
   try {
-    const { userId, itemId, size, quantity } = req.body;
+    const userId = req.userId;
+    const {itemId, size, quantity } = req.body;
 
     const user = await UserModel.findById(userId);
 
@@ -87,7 +89,7 @@ const updateCart = async (req, res) => {
 
 // update user cart
 const getUserCart = async (req, res) => {
-  const { userId } = req.body;
+  const userId = req.userId;
 
   const user = await UserModel.findById(userId);
   // if user not found
