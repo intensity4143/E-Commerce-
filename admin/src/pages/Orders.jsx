@@ -25,8 +25,7 @@ const Orders = ({ token }) => {
           },
         },
       );
-
-      console.log(response.data);
+      
       if (response.data.success) {
         setOrders(response.data.orders);
       } else {
@@ -36,6 +35,27 @@ const Orders = ({ token }) => {
       toast.error(error.message);
     }
   };
+
+  // handler for changing status of order
+  const statusHandler = async (e, orderId) => {
+    try {
+      const response = await axios.post(`${backendUrl}/api/order/status`,
+        {orderId, status:e.target.value},
+        {
+          headers:{
+          Authorization:`Bearer ${token}`
+        }
+      })
+      
+      if(response.data.success){
+        await fetchAllOrders()
+      }
+    } 
+    catch (error) {
+      console.log(error)
+      toast.error(response.data.message)
+    }
+  }
 
   useEffect(() => {
     fetchAllOrders();
@@ -71,6 +91,8 @@ const Orders = ({ token }) => {
                     }
                   })}
                 </div>
+
+                {/* customer info */}
                 <p className="mt-3 mb-2 font-medium">{order.address.firstName + " " + order.address.lastName}</p>
                 <div>
                   <p>{order.address.street + ", "}</p>
@@ -97,7 +119,9 @@ const Orders = ({ token }) => {
               <p className="text-sm sm:text-[15px]">{currency}{order.amount}</p>
 
               {/* to change status of order */}
-              <select value={order.status} className="p-2 font-semibold" >
+              <select 
+                  onChange={(e)=>statusHandler(e, order._id)}
+                  value={order.status} className="p-2 font-semibold" >
                 <option value="Order placed">Order placed</option>
                 <option value="Packing">Packing</option>
                 <option value="Shipped">Shipped</option>

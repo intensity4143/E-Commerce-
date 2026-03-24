@@ -3,7 +3,7 @@ const orderRouter = express.Router();
 
 const adminAuth = require('../middleware/adminAuth')
 const authUser = require('../middleware/auth')
-const {placeOrder, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, updateStatus} = require('../controllers/orderController');
+const {placeOrder, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, updateStatus, verifyStripe} = require('../controllers/orderController');
 
 
 // Admin Features routes
@@ -17,5 +17,8 @@ orderRouter.post('/razor', authUser, placeOrderRazorpay)
 
 // User Feature
 orderRouter.post('/userOrders', authUser, userOrders)
+
+// verify payment
+orderRouter.post('/verifyStripe', authUser, verifyStripe)
 
 module.exports = orderRouter;

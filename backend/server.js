@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const userRouter = require('./routes/userRoutes')
@@ -6,7 +8,6 @@ const cloudinaryConnect = require('./config/cloudinary');
 const producteRouter = require('./routes/productRoute');
 const cartRouter = require('./routes/cartRoute');
 const orderRouter = require('./routes/orderRoute');
-require('dotenv').config();
 
 // App config
 const app = express();

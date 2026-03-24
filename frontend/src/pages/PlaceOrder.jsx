@@ -91,6 +91,26 @@ const PlaceOrder = () => {
             }
             break;
 
+        // case for stipe payment method
+        case 'stripe' :
+            const responseStripe = await axios.post(`${backendUrl}/api/order/stripe`,
+              orderData,
+              {
+                headers:{
+                  Authorization: `Bearer ${token}`
+                }
+              }
+            )  
+            
+            if(responseStripe.data.success){
+              const {session_url} = responseStripe.data
+              window.location.replace(session_url)  // navigate to stripe payment gateway for pament
+            }
+            else{
+              toast.error(responseStripe.data.message)
+            }
+            break;
+
         default:
           break;
       }
