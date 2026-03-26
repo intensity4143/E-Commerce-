@@ -1,9 +1,15 @@
 const orderModel = require("../models/orderModel");
 const UserModel = require("../models/UserModel");
 const Stripe = require("stripe")
+const razorpay = require('razorpay')
 
 // gateway initialize
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+
+const RazorpayInstance = new razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_SECRET_KEY
+})
 
 // global variables
 const currency = 'inr'
@@ -150,7 +156,53 @@ const verifyStripe = async (req, res) => {
 }
 
 // Placing orders using Razorpay
-const placeOrderRazorpay = async (req, res) => {};
+const placeOrderRazorpay = async (req, res) => {
+  try {
+      const userId = req.userId;
+      const { items, amount, address } = req.body;
+
+      const orderData = {
+        userId,
+        items,
+        address,
+        amount,
+        paymentMethod: "Razorpay",
+        payment: false,
+        date: Date.now(),
+      };
+
+      const newOrder = new orderModel(orderData);
+      await newOrder.save();
+
+      const options = {
+        amount: amount * 100,
+        currency: currency.toUpperCase(),
+        receipt: newOrder._id.toString()
+      }
+
+      await RazorpayInstance.orders.create(options, (error, order) =>{
+        if(error){
+          console.log(error)
+          return res.json({
+            success:false,
+            message: error
+          })
+        }
+        
+        return res.json({
+          success:true,
+          order
+        })
+      })
+  } 
+  catch (error) {
+    console.log(error);
+    return res.json({
+      success: false,
+      message: "Payment error!",
+    });
+  }
+};
 
 // All Orders data for Admin Panel
 const allOrders = async (req, res) => {

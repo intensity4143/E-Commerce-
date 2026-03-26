@@ -111,6 +111,24 @@ const PlaceOrder = () => {
             }
             break;
 
+        // razorpay payment
+        case "razorpay":
+            const responseRazorpay = await axios.post(`${backendUrl}/api/order/razorpay`,
+              orderData,
+              {
+                headers:{
+                  Authorization:`Bearer ${token}`
+                }
+              }
+            )
+
+            if(responseRazorpay.data.success){
+              console.log(responseRazorpay.data.order)
+            }
+
+            break;
+        
+
         default:
           break;
       }
