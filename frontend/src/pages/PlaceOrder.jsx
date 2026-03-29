@@ -3,7 +3,7 @@ import Title from "../components/Title";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import CartTotal from "../components/CartTotal";
-import { assets} from "../assets/frontend_assets/assets";
+import { assets } from "../assets/frontend_assets/assets";
 import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -42,100 +42,163 @@ const PlaceOrder = () => {
     setFormData((data) => ({ ...data, [name]: value }));
   };
 
+  const initPay = (order) => {
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+      amount: order.amount,
+      currency: order.currency,
+      name: "Order Payment",
+      description: "Order Payment",
+      order_id: order.id,
+
+      handler: async (response) => {
+        try {
+          const { data } = await axios.post(
+            `${backendUrl}/api/order/verifyRazorpay`,
+            response,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
+
+          if (data.success) {
+            navigate("/orders");
+            setCartItems({});
+          } else {
+            toast.error(data.message);
+          }
+        } catch (error) {
+          console.log(error);
+          toast.error(
+            error.response?.data?.message || "Payment verification failed",
+          );
+        }
+      },
+
+      // theme
+      theme: {
+        color: "#000000",
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+
+    // to handle payment failure
+    rzp.on("payment.failed", function (response) {
+      console.log(response);
+      toast.error("Payment Failed");
+    });
+
+    rzp.open();
+  };
+
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
     try {
       let orderItems = [];
-      
+
       for (const item in cartItems) {
         for (const size in cartItems[item]) {
-          const prodctInfo = structuredClone( products.find((product) => product._id === item));
-          
+          const prodctInfo = structuredClone(
+            products.find((product) => product._id === item),
+          );
+
           if (prodctInfo) {
-            prodctInfo.size = size
-            prodctInfo.quantity = cartItems[item][size]
-            orderItems.push(prodctInfo)
+            prodctInfo.size = size;
+            prodctInfo.quantity = cartItems[item][size];
+            orderItems.push(prodctInfo);
           }
         }
       }
-      
+
       let orderData = {
         address: formData,
         items: orderItems,
-        amount: getCartAmount() + delivery_fee
-      }
-      
+        amount: getCartAmount() + delivery_fee,
+      };
+
       // switch case to call for different order api based on payment method
-      switch(paymentMethod){
-
+      switch (paymentMethod) {
         // API call for COD
-        case 'cod':
-            const response = await axios.post(`${backendUrl}/api/order/place`, 
-              orderData,
-              {
-                headers: {
-                  Authorization :`Bearer ${token}`
-                }
-              }
-            )
+        case "cod":
+          const response = await axios.post(
+            `${backendUrl}/api/order/place`,
+            orderData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
 
-            // if order placed successfully then -> empty carts and navigate to orders page
-            if(response.data.success){
-              console.log(response.data)
-              setCartItems({})
-              navigate('/orders')
-            }
-            else{
-              toast.error(response.data.message)
-            }
-            break;
+          // if order placed successfully then -> empty carts and navigate to orders page
+          if (response.data.success) {
+            console.log(response.data);
+            setCartItems({});
+            navigate("/orders");
+          } else {
+            toast.error(response.data.message);
+          }
+          break;
 
         // case for stipe payment method
-        case 'stripe' :
-            const responseStripe = await axios.post(`${backendUrl}/api/order/stripe`,
-              orderData,
-              {
-                headers:{
-                  Authorization: `Bearer ${token}`
-                }
-              }
-            )  
-            
-            if(responseStripe.data.success){
-              const {session_url} = responseStripe.data
-              window.location.replace(session_url)  // navigate to stripe payment gateway for pament
-            }
-            else{
-              toast.error(responseStripe.data.message)
-            }
-            break;
+        case "stripe":
+          const responseStripe = await axios.post(
+            `${backendUrl}/api/order/stripe`,
+            orderData,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
+
+          if (responseStripe.data.success) {
+            const { session_url } = responseStripe.data;
+            window.location.replace(session_url); // navigate to stripe payment gateway for pament
+          } else {
+            toast.error(responseStripe.data.message);
+          }
+          break;
 
         // razorpay payment
         case "razorpay":
-            const responseRazorpay = await axios.post(`${backendUrl}/api/order/razorpay`,
+          try {
+            const responseRazorpay = await axios.post(
+              `${backendUrl}/api/order/razorpay`,
               orderData,
               {
-                headers:{
-                  Authorization:`Bearer ${token}`
-                }
-              }
-            )
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              },
+            );
 
-            if(responseRazorpay.data.success){
-              console.log(responseRazorpay.data.order)
+            if (responseRazorpay.data.success) {
+              initPay(responseRazorpay.data.order);
+            } 
+            else {
+              toast.error(responseRazorpay.data.message);
             }
-
-            break;
-        
+          } 
+          catch (error) {
+            console.log(error);
+            toast.error(
+              error.response?.data?.message || "Something went wrong",
+            );
+          }
+          break;
 
         default:
           break;
       }
-
-    } catch (error) {
+    } 
+    catch (error) {
       console.log(error);
-      toast.error(error.message)
+      toast.error(error.message);
     }
   };
 
