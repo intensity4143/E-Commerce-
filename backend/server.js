@@ -8,6 +8,7 @@ const cloudinaryConnect = require('./config/cloudinary');
 const producteRouter = require('./routes/productRoute');
 const cartRouter = require('./routes/cartRoute');
 const orderRouter = require('./routes/orderRoute');
+const heroSlideRoute = require('./routes/heroSlideRoute')
 
 // App config
 const app = express();
@@ -24,6 +25,7 @@ app.use('/api/user', userRouter)
 app.use('/api/product', producteRouter)
 app.use('/api/cart', cartRouter)
 app.use('/api/order', orderRouter)
+app.use("/api/slides", heroSlideRoute);
 
 
 // default route
