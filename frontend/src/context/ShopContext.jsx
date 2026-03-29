@@ -174,6 +174,25 @@ const ShopContextProvider = (props) => {
     }
   }, []);
 
+
+  // if token is expired when app starts then remove token from local storage
+  useEffect(() => {
+  const token = localStorage.getItem("token");
+
+  if (!token) return;
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+
+    if (payload.exp * 1000 < Date.now()) {
+      localStorage.removeItem("token");
+      setToken("");
+    }
+  } catch (e) {
+    localStorage.removeItem("token");
+  }
+}, []);
+
   useEffect(() => {
     if (token) {
       getUserCart(token);

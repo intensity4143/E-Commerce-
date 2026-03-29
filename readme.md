@@ -8,6 +8,7 @@ You can use the following credentials to test the application:
 Email: testuser@gmail.com  
 Password: 123456789
 
+## TrendCart
 TrendCart is a full-stack e-commerce website built using the MERN stack. Users can browse products, manage cart, and place orders using Razorpay, Stripe, or Cash on Delivery.
 
 ---
