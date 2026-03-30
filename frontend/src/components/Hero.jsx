@@ -115,18 +115,14 @@ const Hero = () => {
           return (
             <div
               key={slide._id || i}
-              style={{
-                minWidth: "100%",
-                display: "flex",
-                flexDirection: "row",
-                minHeight: "500px",
-              }}
+              className="flex-col sm:flex-row"
+              style={{ minWidth: "100%", display: "flex", height: "565px" }}
             >
               {/* Left text panel — only if text exists */}
               {hasText && (
                 <div
+                  className="w-full sm:w-1/2"
                   style={{
-                    width: "50%",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -214,22 +210,13 @@ const Hero = () => {
 
               {/* Image — full width if no text, half if text exists */}
               <div
-                style={{
-                  width: hasText ? "50%" : "100%",
-                  minHeight: "500px",
-                  overflow: "hidden",
-                }}
+                className={hasText ? "w-full sm:w-1/2" : "w-full"}
+                style={{ height: "100%", overflow: "hidden" }}
               >
                 <img
                   src={slide.image}
                   alt={slide.heading || "slide"}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    display: "block",
-                    minHeight: "500px",
-                  }}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                 />
               </div>
             </div>
