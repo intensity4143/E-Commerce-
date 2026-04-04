@@ -8,7 +8,7 @@ const Footer = () => {
         <div>
             <img src={assets.logo} className='mb5 w-32' alt="" />
             <p className='w-full md:w-2/3 text-gray-600'>
-                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Labore ex obcaecati perspiciatis a unde rerum quam enim, libero dolores at, ea culpa. Excepturi, aut dolor? Lorem ipsum dolor sit amet, consectetur adipisicing elit. 
+                Discover your style with TrendCart — your go-to destination for trendy, affordable, and high-quality fashion, delivered right to your doorstep.
             </p>
         </div>
 
@@ -24,7 +24,7 @@ const Footer = () => {
         <div>
             <p className='text-xl font-medium mb-5'>GET IN TOUCH-</p>
             <ul className='flex flex-col gap-1 text-gray-600'>
-                <li>+91-56161xxx</li>
+                <li>+91-56161XXXXX</li>
                 <li>contact@gmail.com</li>
             </ul>
         </div>
@@ -33,7 +33,7 @@ const Footer = () => {
 
       <div>
         <hr />
-        <p className='py-5 text-sm text-center'>Copyright 2025@ forever.com - All Right Reserved.</p>
+        <p className='py-5 text-sm text-center'>Copyright 2026@ TrendCart - All Right Reserved.</p>
       </div>
 
     </div>
