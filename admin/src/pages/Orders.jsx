@@ -53,7 +53,7 @@ const Orders = ({ token }) => {
     } 
     catch (error) {
       console.log(error)
-      toast.error(response.data.message)
+      toast.error(error.message)
     }
   }
 
@@ -93,17 +93,17 @@ const Orders = ({ token }) => {
                 </div>
 
                 {/* customer info */}
-                <p className="mt-3 mb-2 font-medium">{order.address.firstName + " " + order.address.lastName}</p>
+                <p className="mt-3 mb-2 font-medium">{order.address.fullName}</p>
                 <div>
-                  <p>{order.address.street + ", "}</p>
+                  <p>{order.address.houseNo}, {order.address.street}</p>
                   <p>
                     {order.address.city +
                       ", " +
                       order.address.state +
                       ", " +
                       order.address.country +
-                      ", " +
-                      order.address.zipcode}
+                      " — " +
+                      order.address.pincode}
                   </p>
                 </div>
                 <p>{order.address.phone}</p>
@@ -122,10 +122,11 @@ const Orders = ({ token }) => {
               <select 
                   onChange={(e)=>statusHandler(e, order._id)}
                   value={order.status} className="p-2 font-semibold" >
-                <option value="Order placed">Order placed</option>
-                <option value="Packing">Packing</option>
+                <option value="Order Placed">Order Placed</option>
+                <option value="Processing">Processing</option>
+                <option value="Packed">Packed</option>
                 <option value="Shipped">Shipped</option>
-                <option value="Out for Delivery">Out for Delivery</option>
+                <option value="Out For Delivery">Out For Delivery</option>
                 <option value="Delivered">Delivered</option>
               </select>
 

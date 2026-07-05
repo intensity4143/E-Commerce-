@@ -6,7 +6,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 // ── helpers ──────────────────────────────────────────────
-const inputCls = 'border border-gray-300 rounded py-1.5 px-3.5 w-full text-sm focus:outline-none focus:border-gray-600 disabled:bg-gray-50 disabled:text-gray-500';
+const inputCls = 'border border-gray-300 rounded py-1.5 px-3.5 w-full text-base focus:outline-none focus:border-gray-600 disabled:bg-gray-50 disabled:text-gray-500';
 const sectionCls = 'border border-gray-200 rounded p-6 mb-6';
 
 // ── Personal Info ─────────────────────────────────────────
@@ -35,7 +35,7 @@ const PersonalInfo = ({ profile, token, backendUrl, onUpdate }) => {
   return (
     <div className={sectionCls}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-medium text-base">Personal Information</h2>
+        <h2 className="font-medium text-lg">Personal Information</h2>
         {!editing && (
           <button onClick={() => setEditing(true)} className="text-sm border border-gray-300 px-4 py-1.5 hover:border-black transition-colors">
             Edit Profile
@@ -44,16 +44,16 @@ const PersonalInfo = ({ profile, token, backendUrl, onUpdate }) => {
       </div>
       <div className="flex flex-col gap-3">
         <div>
-          <label className="text-xs text-gray-500 mb-1 block">Full Name</label>
+          <label className="text-sm text-gray-500 mb-1 block">Full Name</label>
           <input className={inputCls} value={form.name} disabled={!editing}
             onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
         </div>
         <div>
-          <label className="text-xs text-gray-500 mb-1 block">Email</label>
+          <label className="text-sm text-gray-500 mb-1 block">Email</label>
           <input className={inputCls} value={profile?.email || ''} disabled />
         </div>
         <div>
-          <label className="text-xs text-gray-500 mb-1 block">Phone Number</label>
+          <label className="text-sm text-gray-500 mb-1 block">Phone Number</label>
           <input className={inputCls} value={form.phone} disabled={!editing} placeholder="Not set"
             onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} />
         </div>
@@ -75,19 +75,19 @@ const AddressCard = ({ addr, onEdit, onDelete, onSetDefault }) => (
     {addr.isDefault && (
       <span className="absolute top-3 right-3 text-[10px] bg-black text-white px-2 py-0.5 rounded-full">Default</span>
     )}
-    <p className="font-medium text-sm">{addr.fullName}</p>
-    <p className="text-xs text-gray-500 mt-0.5">{addr.phone}</p>
-    <p className="text-xs text-gray-600 mt-1">
+    <p className="font-medium text-base">{addr.fullName}</p>
+    <p className="text-sm text-gray-500 mt-0.5">{addr.phone}</p>
+    <p className="text-sm text-gray-600 mt-1">
       {addr.houseNo}, {addr.street}{addr.landmark ? `, ${addr.landmark}` : ''}
     </p>
-    <p className="text-xs text-gray-600">{addr.city}, {addr.state} - {addr.pincode}</p>
-    <p className="text-xs text-gray-600">{addr.country}</p>
-    <span className="inline-block mt-2 text-[10px] border border-gray-300 px-2 py-0.5 text-gray-500">{addr.addressType}</span>
+    <p className="text-sm text-gray-600">{addr.city}, {addr.state} - {addr.pincode}</p>
+    <p className="text-sm text-gray-600">{addr.country}</p>
+    <span className="inline-block mt-2 text-xs border border-gray-300 px-2 py-0.5 text-gray-500">{addr.addressType}</span>
     <div className="flex gap-3 mt-3">
-      <button onClick={() => onEdit(addr)} className="text-xs text-gray-600 hover:text-black underline underline-offset-2">Edit</button>
-      <button onClick={() => onDelete(addr._id)} className="text-xs text-red-500 hover:text-red-700 underline underline-offset-2">Delete</button>
+      <button onClick={() => onEdit(addr)} className="text-sm text-gray-600 hover:text-black underline underline-offset-2">Edit</button>
+      <button onClick={() => onDelete(addr._id)} className="text-sm text-red-500 hover:text-red-700 underline underline-offset-2">Delete</button>
       {!addr.isDefault && (
-        <button onClick={() => onSetDefault(addr._id)} className="text-xs text-gray-600 hover:text-black underline underline-offset-2">Set Default</button>
+        <button onClick={() => onSetDefault(addr._id)} className="text-sm text-gray-600 hover:text-black underline underline-offset-2">Set Default</button>
       )}
     </div>
   </div>
@@ -140,14 +140,14 @@ const SavedAddresses = ({ addresses, setAddresses, token, backendUrl }) => {
   return (
     <div className={sectionCls}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="font-medium text-base">Saved Addresses</h2>
+        <h2 className="font-medium text-lg">Saved Addresses</h2>
         {!atMax ? (
           <button onClick={() => { setEditAddr(null); setShowModal(true); }}
             className="text-sm border border-gray-300 px-4 py-1.5 hover:border-black transition-colors">
             + Add Address
           </button>
         ) : (
-          <span className="text-xs text-gray-500">Max 5 addresses reached</span>
+          <span className="text-sm text-gray-500">Max 5 addresses reached</span>
         )}
       </div>
 
@@ -158,7 +158,7 @@ const SavedAddresses = ({ addresses, setAddresses, token, backendUrl }) => {
       )}
 
       {addresses.length === 0 ? (
-        <p className="text-sm text-gray-400">No saved addresses. Add one to get started.</p>
+        <p className="text-base text-gray-400">No saved addresses. Add one to get started.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {addresses.map(addr => (
@@ -206,7 +206,7 @@ const Security = ({ token, backendUrl, onLogout }) => {
 
   return (
     <div className={sectionCls}>
-      <h2 className="font-medium text-base mb-4">Security</h2>
+      <h2 className="font-medium text-lg mb-4">Security</h2>
       <div className="flex flex-col gap-3">
         <button onClick={() => setShowPwd(p => !p)}
           className="w-full sm:w-auto border border-gray-300 px-4 py-2 text-sm text-left hover:border-black transition-colors">
@@ -267,12 +267,12 @@ const Profile = () => {
 
         {/* My Orders card */}
         <div className={sectionCls}>
-          <h2 className="font-medium text-base mb-4">My Orders</h2>
+          <h2 className="font-medium text-lg mb-4">My Orders</h2>
           <button onClick={() => navigate('/orders')}
             className="flex items-center gap-3 border border-gray-200 rounded p-4 w-full sm:w-auto hover:border-black transition-colors text-left">
             <div>
-              <p className="text-sm font-medium">View My Orders</p>
-              <p className="text-xs text-gray-500 mt-0.5">Track and manage your orders</p>
+              <p className="text-base font-medium">View My Orders</p>
+              <p className="text-sm text-gray-500 mt-0.5">Track and manage your orders</p>
             </div>
             <span className="ml-auto text-gray-400">›</span>
           </button>
