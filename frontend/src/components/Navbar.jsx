@@ -68,7 +68,9 @@ const Navbar = () => {
           {token && dropdownOpen && (
             <div className="absolute dropdown-menu right-0 pt-4 z-50">
               <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 rounded">
-                <p className="cursor-pointer hover:text-black">My Profile</p>
+                <p className="cursor-pointer hover:text-black"
+                  onClick={() => { navigate('/profile'); setDropdownOpen(false); }}
+                >My Profile</p>
                 <p
                   onClick={() => {
                     navigate("/orders");

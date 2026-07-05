@@ -17,6 +17,8 @@ const ShopContextProvider = (props) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState("");
+  const [userProfile, setUserProfile] = useState(null);
+  const [addresses, setAddresses] = useState([]);
   const navigate = useNavigate();
 
   const addToCart = async (itemId, size) => {
@@ -163,7 +165,6 @@ const ShopContextProvider = (props) => {
       if (response.data.success) setCartItems(response.data.cartData);
     } catch (error) {
       console.log(error);
-      toast.error(error.message);
     }
 
     try {
@@ -173,6 +174,19 @@ const ShopContextProvider = (props) => {
         { headers: { Authorization: `Bearer ${token}` } },
       );
       if (response.data.success) setSavedItems(response.data.savedItems);
+    } catch (error) {
+      console.log(error);
+    }
+
+    try {
+      const response = await axios.get(
+        `${backendUrl}/api/user/profile`,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (response.data.success) {
+        setUserProfile(response.data.user);
+        setAddresses(response.data.user.addresses || []);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -299,6 +313,10 @@ const ShopContextProvider = (props) => {
     removeSavedItem,
     buyNowItem,
     setBuyNowItem,
+    userProfile,
+    setUserProfile,
+    addresses,
+    setAddresses,
   };
 
   return (
