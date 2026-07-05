@@ -18,6 +18,12 @@ const ShopContextProvider = (props) => {
   const navigate = useNavigate();
 
   const addToCart = async (itemId, size) => {
+    if (!token) {
+      toast.error("Please login to add items to cart!");
+      navigate("/login");
+      return;
+    }
+
     if (!size) {
       toast.error("Select Product Size!");
       return;
