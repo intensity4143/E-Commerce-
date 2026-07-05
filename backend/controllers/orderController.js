@@ -52,7 +52,7 @@ const placeOrder = async (req, res) => {
         await newOrder.save();
         await UserModel.findByIdAndUpdate(userId, { cartData: {} });
 
-        return res.json({ success: true, message: 'Order Placed' });
+        return res.json({ success: true, message: 'Order Placed', orderId: newOrder.orderId });
     } catch (error) {
         console.log(error);
         return res.json({ success: false, message: 'Error while Placing Order' });
@@ -124,7 +124,8 @@ const verifyStripe = async (req, res) => {
         if (success === 'true') {
             await orderModel.findByIdAndUpdate(orderId, { payment: true });
             await UserModel.findByIdAndUpdate(userId, { cartData: {} });
-            return res.json({ success: true });
+            const order = await orderModel.findById(orderId).select('orderId');
+            return res.json({ success: true, orderId: order?.orderId });
         } else {
             await orderModel.findByIdAndDelete(orderId);
             return res.json({ success: false });
@@ -185,7 +186,7 @@ const verifyRazorpay = async (req, res) => {
             if (!order) return res.json({ success: false, message: 'Order not found' });
             await orderModel.findByIdAndUpdate(order._id, { payment: true });
             await UserModel.findByIdAndUpdate(userId, { cartData: {} });
-            return res.json({ success: true, message: 'Payment Successful' });
+            return res.json({ success: true, message: 'Payment Successful', orderId: order.orderId });
         } else {
             return res.json({ success: false, message: 'Payment not completed' });
         }

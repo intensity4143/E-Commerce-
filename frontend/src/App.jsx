@@ -17,8 +17,8 @@ import SearchBar from './components/SearchBar'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ScrollToTop from './components/ScrollToTop'
+import OrderSuccess from './pages/OrderSuccess'
 import Verify from './pages/Verify'
-
 
 
 function App() {
@@ -43,6 +43,7 @@ function App() {
         <Route path='/orders/:orderId' element={<OrderDetail/>}/>
         <Route path='/profile' element={<Profile/>}/>
         <Route path='/verify' element={<Verify/>}/>
+        <Route path='/order-success/:orderId' element={<OrderSuccess/>}/>
       </Routes>
       <Footer/>
     </div>

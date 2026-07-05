@@ -158,7 +158,7 @@ const PlaceOrder = () => {
         try {
           const { data } = await axios.post(`${backendUrl}/api/order/verifyRazorpay`, response,
             { headers: { Authorization: `Bearer ${token}` } });
-          if (data.success) { navigate('/orders'); clearOrder(); }
+          if (data.success) { clearOrder(); navigate(`/order-success/${data.orderId}`); }
           else toast.error(data.message);
         } catch (error) {
           toast.error(error.response?.data?.message || 'Payment verification failed');
@@ -183,7 +183,7 @@ const PlaceOrder = () => {
         case 'cod': {
           const { data } = await axios.post(`${backendUrl}/api/order/place`, orderData,
             { headers: { Authorization: `Bearer ${token}` } });
-          if (data.success) { clearOrder(); navigate('/orders'); }
+          if (data.success) { clearOrder(); navigate(`/order-success/${data.orderId}`); }
           else toast.error(data.message);
           break;
         }
