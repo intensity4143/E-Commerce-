@@ -12,6 +12,8 @@ const ShopContextProvider = (props) => {
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [cartItems, setCartItems] = useState({});
+  const [savedItems, setSavedItems] = useState({});
+  const [buyNowItem, setBuyNowItem] = useState(null);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState("");
@@ -156,18 +158,82 @@ const ShopContextProvider = (props) => {
       const response = await axios.post(
         `${backendUrl}/api/cart/get`,
         {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+        { headers: { Authorization: `Bearer ${token}` } },
       );
-
-      if (response.data.success) {
-        setCartItems(response.data.cartData);
-      }
+      if (response.data.success) setCartItems(response.data.cartData);
     } catch (error) {
       console.log(error);
+      toast.error(error.message);
+    }
+
+    try {
+      const response = await axios.post(
+        `${backendUrl}/api/cart/get-saved`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+      if (response.data.success) setSavedItems(response.data.savedItems);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const saveForLater = async (itemId, size) => {
+    setSavedItems((prev) => {
+      const updated = { ...prev };
+      if (!updated[itemId]) updated[itemId] = {};
+      updated[itemId][size] = true;
+      return updated;
+    });
+    updateQuantity(itemId, size, 0);
+    try {
+      await axios.post(
+        `${backendUrl}/api/cart/save`,
+        { itemId, size },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const moveToCart = async (itemId, size) => {
+    setSavedItems((prev) => {
+      const updated = { ...prev };
+      if (updated[itemId]) {
+        delete updated[itemId][size];
+        if (Object.keys(updated[itemId]).length === 0) delete updated[itemId];
+      }
+      return updated;
+    });
+    await addToCart(itemId, size);
+    try {
+      await axios.post(
+        `${backendUrl}/api/cart/move-to-cart`,
+        { itemId, size },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const removeSavedItem = async (itemId, size) => {
+    setSavedItems((prev) => {
+      const updated = { ...prev };
+      if (updated[itemId]) {
+        delete updated[itemId][size];
+        if (Object.keys(updated[itemId]).length === 0) delete updated[itemId];
+      }
+      return updated;
+    });
+    try {
+      await axios.post(
+        `${backendUrl}/api/cart/remove-saved`,
+        { itemId, size },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+    } catch (error) {
       toast.error(error.message);
     }
   };
@@ -227,6 +293,12 @@ const ShopContextProvider = (props) => {
     backendUrl,
     token,
     setToken,
+    savedItems,
+    saveForLater,
+    moveToCart,
+    removeSavedItem,
+    buyNowItem,
+    setBuyNowItem,
   };
 
   return (

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Title from "../components/Title";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
@@ -20,7 +20,45 @@ const PlaceOrder = () => {
     setCartItems,
     getCartAmount,
     delivery_fee,
+    buyNowItem,
+    setBuyNowItem,
   } = useContext(ShopContext);
+
+  const getOrderItems = () => {
+    if (buyNowItem) {
+      const productInfo = structuredClone(products.find((p) => p._id === buyNowItem.itemId));
+      if (productInfo) {
+        productInfo.size = buyNowItem.size;
+        productInfo.quantity = 1;
+        return [productInfo];
+      }
+      return [];
+    }
+    const items = [];
+    for (const item in cartItems) {
+      for (const size in cartItems[item]) {
+        const productInfo = structuredClone(products.find((p) => p._id === item));
+        if (productInfo) {
+          productInfo.size = size;
+          productInfo.quantity = cartItems[item][size];
+          items.push(productInfo);
+        }
+      }
+    }
+    return items;
+  };
+
+  const getOrderAmount = () => {
+    if (buyNowItem) {
+      const product = products.find((p) => p._id === buyNowItem.itemId);
+      return product ? product.price + delivery_fee : delivery_fee;
+    }
+    return getCartAmount() + delivery_fee;
+  };
+
+  useEffect(() => {
+    return () => setBuyNowItem(null);
+  }, []);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -65,7 +103,7 @@ const PlaceOrder = () => {
 
           if (data.success) {
             navigate("/orders");
-            setCartItems({});
+            clearOrder();
           } else {
             toast.error(data.message);
           }
@@ -98,26 +136,17 @@ const PlaceOrder = () => {
     e.preventDefault();
 
     try {
-      let orderItems = [];
-
-      for (const item in cartItems) {
-        for (const size in cartItems[item]) {
-          const prodctInfo = structuredClone(
-            products.find((product) => product._id === item),
-          );
-
-          if (prodctInfo) {
-            prodctInfo.size = size;
-            prodctInfo.quantity = cartItems[item][size];
-            orderItems.push(prodctInfo);
-          }
-        }
-      }
+      const orderItems = getOrderItems();
 
       let orderData = {
         address: formData,
         items: orderItems,
-        amount: getCartAmount() + delivery_fee,
+        amount: getOrderAmount(),
+      };
+
+      const clearOrder = () => {
+        if (buyNowItem) setBuyNowItem(null);
+        else setCartItems({});
       };
 
       // switch case to call for different order api based on payment method
@@ -137,7 +166,7 @@ const PlaceOrder = () => {
           // if order placed successfully then -> empty carts and navigate to orders page
           if (response.data.success) {
             console.log(response.data);
-            setCartItems({});
+            clearOrder();
             navigate("/orders");
           } else {
             toast.error(response.data.message);

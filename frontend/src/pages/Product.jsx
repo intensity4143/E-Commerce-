@@ -3,10 +3,11 @@ import { useParams } from "react-router-dom";
 import { ShopContext } from "../context/ShopContext";
 import { assets } from "../assets/frontend_assets/assets";
 import RelatedProducts from "../components/RelatedProducts";
+import { toast } from "react-toastify";
 
 const Product = () => {
   const { productId } = useParams();
-  const { products, currency, addToCart } = useContext(ShopContext);
+  const { products, currency, addToCart, token, navigate, setBuyNowItem } = useContext(ShopContext);
   const [productData, setProductData] = useState(false);
   const [image, setImage] = useState("");
   const [size, setSize] = useState("");
@@ -91,13 +92,26 @@ const Product = () => {
             </div>
           </div>
 
-          {/* --- add to cart button --- */}
-          <button
-            className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700"
-            onClick={() => addToCart(productData._id, size)}
-          >
-            ADD TO CART
-          </button>
+          {/* --- add to cart / buy now buttons --- */}
+          <div className="flex gap-4">
+            <button
+              className="bg-black text-white px-8 py-3 text-sm active:bg-gray-700"
+              onClick={() => addToCart(productData._id, size)}
+            >
+              ADD TO CART
+            </button>
+            <button
+              className="border border-black text-black px-8 py-3 text-sm hover:bg-black hover:text-white transition-colors active:bg-gray-700"
+              onClick={() => {
+                if (!token) { navigate('/login'); return; }
+                if (!size) { toast.error('Select Product Size!'); return; }
+                setBuyNowItem({ itemId: productData._id, size });
+                navigate('/place-order');
+              }}
+            >
+              BUY NOW
+            </button>
+          </div>
 
           <hr className="mt-8 sm:w-4/5" />
           <div className="text-sm text-gray-500 mt-5 flex flex-col gap-1">

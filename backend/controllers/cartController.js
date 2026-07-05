@@ -105,4 +105,93 @@ const getUserCart = async (req, res) => {
   });
 };
 
-module.exports =  { addToCart, updateCart, getUserCart };
+// save item for later (move from cart to savedItems)
+const saveForLater = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { itemId, size } = req.body;
+    const user = await UserModel.findById(userId);
+    if (!user) return res.json({ success: false, message: 'User not found' });
+
+    const cartData = user.cartData || {};
+    const savedItems = user.savedItems || {};
+
+    // remove from cart
+    if (cartData[itemId]) {
+      delete cartData[itemId][size];
+      if (Object.keys(cartData[itemId]).length === 0) delete cartData[itemId];
+    }
+
+    // add to saved
+    if (!savedItems[itemId]) savedItems[itemId] = {};
+    savedItems[itemId][size] = true;
+
+    await UserModel.findByIdAndUpdate(userId, { cartData, savedItems });
+    return res.json({ success: true, message: 'Saved for later' });
+  } catch (error) {
+    return res.json({ success: false, message: 'Error saving item' });
+  }
+};
+
+// move saved item back to cart
+const moveToCart = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { itemId, size } = req.body;
+    const user = await UserModel.findById(userId);
+    if (!user) return res.json({ success: false, message: 'User not found' });
+
+    const cartData = user.cartData || {};
+    const savedItems = user.savedItems || {};
+
+    // add to cart
+    if (!cartData[itemId]) cartData[itemId] = {};
+    cartData[itemId][size] = (cartData[itemId][size] || 0) + 1;
+
+    // remove from saved
+    if (savedItems[itemId]) {
+      delete savedItems[itemId][size];
+      if (Object.keys(savedItems[itemId]).length === 0) delete savedItems[itemId];
+    }
+
+    await UserModel.findByIdAndUpdate(userId, { cartData, savedItems });
+    return res.json({ success: true, message: 'Moved to cart' });
+  } catch (error) {
+    return res.json({ success: false, message: 'Error moving to cart' });
+  }
+};
+
+// remove a saved item
+const removeSavedItem = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const { itemId, size } = req.body;
+    const user = await UserModel.findById(userId);
+    if (!user) return res.json({ success: false, message: 'User not found' });
+
+    const savedItems = user.savedItems || {};
+    if (savedItems[itemId]) {
+      delete savedItems[itemId][size];
+      if (Object.keys(savedItems[itemId]).length === 0) delete savedItems[itemId];
+    }
+
+    await UserModel.findByIdAndUpdate(userId, { savedItems });
+    return res.json({ success: true, message: 'Removed from saved' });
+  } catch (error) {
+    return res.json({ success: false, message: 'Error removing saved item' });
+  }
+};
+
+// get saved items
+const getSavedItems = async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.userId);
+    if (!user) return res.json({ success: false, message: 'User not found' });
+    return res.json({ success: true, savedItems: user.savedItems || {} });
+  } catch (error) {
+    return res.json({ success: false, message: 'Error fetching saved items' });
+  }
+};
+
+module.exports =  { addToCart, updateCart, getUserCart, saveForLater, moveToCart, removeSavedItem, getSavedItems };
+

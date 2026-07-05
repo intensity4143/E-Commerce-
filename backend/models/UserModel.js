@@ -18,6 +18,10 @@ const UserSchema = new mongoose.Schema({
         type: Object,
         default: {},
     },
+    savedItems: {
+        type: Object,
+        default: {},
+    },
 }, {minimize: false})
 
 module.exports = mongoose.model("User", UserSchema);
